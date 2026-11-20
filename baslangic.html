@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Hareket</title>
+  <style>
+    body { margin: 0; overflow: hidden; }
+  </style>
+</head>
+<body>
+
+<script src="three.min.js"></script>
+
+<script>
+  // ---- Onceki derslerden tanidik: sahne, kamera, cizici, isik, sekiller ----
+  const sahne = new THREE.Scene();
+  sahne.background = new THREE.Color(0x0b1d3a);
+
+  const kamera = new THREE.PerspectiveCamera(
+    75, window.innerWidth / window.innerHeight, 0.1, 1000
+  );
+  kamera.position.set(0, 2, 10);
+  kamera.lookAt(0, 0, 0);
+
+  const cizici = new THREE.WebGLRenderer();
+  cizici.setSize(window.innerWidth, window.innerHeight);
+  cizici.shadowMap.enabled = true;   // BONUS: golgeleri ac
+  document.body.appendChild(cizici.domElement);
+
+  // ---- YENI: ISIKLAR ----
+  const genelIsik = new THREE.AmbientLight(0xffffff, 0.4);      // her yeri hafifce aydinlatir
+  sahne.add(genelIsik);
+
+  const gunes = new THREE.DirectionalLight(0xffffff, 0.9);      // gunes gibi, bir yonden gelir
+  gunes.position.set(5, 10, 7);
+  gunes.castShadow = true;                                      // BONUS: golge dusur
+  gunes.shadow.camera.left = -10;
+  gunes.shadow.camera.right = 10;
+  gunes.shadow.camera.top = 10;
+  gunes.shadow.camera.bottom = -10;
+  sahne.add(gunes);
+
+  // ---- YENI: RENKLI MALZEMELER ----
+  const kirmizi = new THREE.MeshStandardMaterial({ color: 0xff595e });
+  const sari    = new THREE.MeshStandardMaterial({ color: 0xffca3a });
+  const yesil   = new THREE.MeshStandardMaterial({ color: 0x8ac926 });
+  const mavi    = new THREE.MeshStandardMaterial({ color: 0x1982c4 });
+
+  // ---- 1) KUP ----
+  const kup = new THREE.Mesh(new THREE.BoxGeometry(2, 2, 2), kirmizi);
+  kup.position.set(-4.5, -1, 0);
+  kup.castShadow = true;
+  sahne.add(kup);
+
+  // ---- 2) KURE ----
+  const kure = new THREE.Mesh(new THREE.SphereGeometry(1.2, 32, 32), sari);
+  kure.position.set(-1.5, -0.8, 0);
+  kure.castShadow = true;
+  sahne.add(kure);
+
+  // ---- 3) SILINDIR ----
+  const silindir = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 2.5, 32), yesil);
+  silindir.position.set(1.5, -0.75, 0);
+  silindir.castShadow = true;
+  sahne.add(silindir);
+
+  // ---- 4) HALKA ----
+  const halka = new THREE.Mesh(new THREE.TorusGeometry(1, 0.4, 16, 48), mavi);
+  halka.position.set(4.5, -0.6, 0);
+  halka.castShadow = true;
+  sahne.add(halka);
+
+  // ---- 5) ZEMIN (artik dolu bir levha) ----
+  const zeminMalzeme = new THREE.MeshStandardMaterial({ color: 0x2a3f6b });
+  const zemin = new THREE.Mesh(new THREE.PlaneGeometry(30, 30), zeminMalzeme);
+  zemin.rotation.x = -Math.PI / 2;
+  zemin.position.y = -2;
+  zemin.receiveShadow = true;        // BONUS: golgeyi uzerinde goster
+  sahne.add(zemin);
+
+  // ---- GOREV 1: Zaman olcer ekle ----
+  // Ipucu: const saat = new THREE.Clock();
+  //        (animasyon fonksiyonunun DISINDA, burada)
+
+  // ---- Animasyon ----
+  function ciz() {
+    requestAnimationFrame(ciz);
+
+    // GOREV 1 devami: zamani oku
+    // Ipucu: const t = saat.getElapsedTime();
+
+    // GOREV 2: Kup saga sola sallansin
+    // Ipucu: kup.position.x = -4.5 + Math.sin(t) * 1;
+
+    // GOREV 3: Kure ziplasin
+    // Ipucu: kure.position.y = -0.8 + Math.abs(Math.sin(t * 3)) * 2;
+
+    // GOREV 4: Silindir havada suzulsun
+    // Ipucu: silindir.position.y = Math.sin(t * 2) * 0.6;
+
+    // GOREV 5 (bonus): Halka nefes alsin (buyusun kuculsun)
+    // Ipucu: const nefes = 1 + Math.sin(t * 2) * 0.15;
+    //        halka.scale.set(nefes, nefes, nefes);
+
+    // Donmeye devam (Ders 1'den)
+    kup.rotation.y += 0.01;
+    silindir.rotation.y += 0.01;
+    halka.rotation.y += 0.02;
+
+    cizici.render(sahne, kamera);
+  }
+  ciz();
+</script>
+
+</body>
+</html>

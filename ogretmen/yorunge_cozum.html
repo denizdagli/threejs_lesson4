@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Hareket</title>
+  <style>
+    body { margin: 0; overflow: hidden; }
+  </style>
+</head>
+<body>
+
+<script src="three.min.js"></script>
+
+<script>
+  // ---- Onceki derslerden tanidik: sahne, kamera, cizici, isik, sekiller ----
+  const sahne = new THREE.Scene();
+  sahne.background = new THREE.Color(0x050b1a);
+
+  const kamera = new THREE.PerspectiveCamera(
+    75, window.innerWidth / window.innerHeight, 0.1, 1000
+  );
+  kamera.position.set(0, 7, 12);
+  kamera.lookAt(0, 0, 0);
+
+  const cizici = new THREE.WebGLRenderer();
+  cizici.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(cizici.domElement);
+
+  // ---- YORUNGE: gunes, gezegen ve ay ----
+  sahne.add(new THREE.AmbientLight(0xffffff, 0.25));
+  const gunesIsigi = new THREE.PointLight(0xffffff, 1.6, 100);   // gunesin icinden her yone isik
+  sahne.add(gunesIsigi);
+
+  const gunes = new THREE.Mesh(
+    new THREE.SphereGeometry(1.5, 32, 32),
+    new THREE.MeshBasicMaterial({ color: 0xffd23f })
+  );
+  sahne.add(gunes);
+
+  const gezegen = new THREE.Mesh(
+    new THREE.SphereGeometry(0.7, 32, 32),
+    new THREE.MeshStandardMaterial({ color: 0x1982c4 })
+  );
+  sahne.add(gezegen);
+
+  const ay = new THREE.Mesh(
+    new THREE.SphereGeometry(0.25, 32, 32),
+    new THREE.MeshStandardMaterial({ color: 0xcccccc })
+  );
+  sahne.add(ay);
+
+  const saat = new THREE.Clock();
+
+  function ciz() {
+    requestAnimationFrame(ciz);
+    const t = saat.getElapsedTime();
+
+    // Daire cizmek icin: x'e cos, z'ye sin yaz
+    gezegen.position.x = Math.cos(t * 0.8) * 5;
+    gezegen.position.z = Math.sin(t * 0.8) * 5;
+
+    // Ay, gezegenin etrafinda doner (gezegenin konumu + kucuk daire)
+    ay.position.x = gezegen.position.x + Math.cos(t * 3) * 1.4;
+    ay.position.z = gezegen.position.z + Math.sin(t * 3) * 1.4;
+
+    cizici.render(sahne, kamera);
+  }
+  ciz();
+</script>
+
+</body>
+</html>
